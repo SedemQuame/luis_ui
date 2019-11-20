@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ChatBot</title>
+    <!-- Bootstrap Css -->
+    <link rel=" stylesheet " href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css " integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T " crossorigin="anonymous ">
+
+    <!-- css link -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+    <div>
+        <p class="text-center header">VBank ChatBot</p>
+        <p class="text-center sub-header">Banking Made Easier</p>
+    </div>
+    <div class="row">
+        <div id="pages" class="col-sm  offset-md-3 col-md-6 offset-lg-4 col-lg-4 row">
+            <a class="col-6 btn btn-success" href="#">ChatBot</a>
+            <a class="col-6 btn btn-success" href="#">FAQs</a>
+        </div>
+    </div>
+    <div class="bot offset-md-3 col-md-6 offset-lg-4 col-lg-4">
+        <div class="messages">
+            <!-- <p class="msg humanQuery">hi</p> -->
+            <p class="msg botResponse">Hello</p>
+
+            <% for(let i = 0; i < humanQueries.length; i++){ %>
+                <p class="msg humanQuery">
+                    <%= humanQueries[i] %>
+                </p>
+                <%}%>
+        </div>
+        <form class="row" action="/" method="post">
+            <div class="input-group mb-3 ">
+                <input type="text " class="form-control " name="humansQuery" placeholder="Please enter message here." required>
+                <button class="btn btn-success input-group-append ">
+                    <img src="images/right.png " alt="submit ">
+                </button>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>
