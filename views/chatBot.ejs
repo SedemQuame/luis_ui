@@ -26,15 +26,19 @@
         </div>
     </div>
     <div class="bot offset-md-3 col-md-6 offset-lg-4 col-lg-4">
-        <div class="messages">
-            <!-- <p class="msg humanQuery">hi</p> -->
-            <p class="msg botResponse">Hello</p>
-
-            <% for(let i = 0; i < humanQueries.length; i++){ %>
-                <p class="msg humanQuery">
-                    <%= humanQueries[i] %>
-                </p>
-                <%}%>
+        <div class="messageContainer">
+            <div class="messages">
+                <% for(let i = 0; i < humanQueries.length; i++){ %>
+                    <p class="msg humanQuery">
+                        <%= humanQueries[i] %>
+                    </p>
+                    <% if(i > 1) { %>
+                        <p class="msg botResponse">
+                            <%= botResponses[i] %>
+                        </p>
+                        <% } %>
+                            <%}%>
+            </div>
         </div>
         <form class="row" action="/" method="post">
             <div class="input-group mb-3 ">
@@ -45,6 +49,8 @@
             </div>
         </form>
     </div>
+
+    <script src="js/scroller.js"></script>
 </body>
 
 </html>

@@ -1,21 +1,18 @@
 // jshint esversion: 6
-
 console.log("luis app started");
 
 // requiring node modules.
 const express = require("express");
 const bodyParser = require("body-parser");
-
-// require new node modules.
 let mongoose = require("mongoose");
 let request = require('request');
 
+// creating app using express module.
 const app = express();
 
 // Requesting data from url
 let query = '';
 const key = '205455bb2302469c9e4ee8194534b487';
-
 
 // connecting the mongo database.
 mongoose.connect("mongodb://localhost/luisDB", { useUnifiedTopology: true, useNewUrlParser: true });
@@ -24,6 +21,9 @@ let answerSchema = null;
 
 let humansQuery = "";
 let listHumanQueries = [];
+
+let botResponses = "";
+let listOfBotResponses = [];
 
 // checking mongo connection
 let db = mongoose.connection;
@@ -64,11 +64,16 @@ app.get("/", (req, res) => {
     // Todo: Check for changes in db and pass them to
     // the chatBot template to be displayed on the UI.
     listHumanQueries.push(humansQuery);
-    console.log(listHumanQueries);
+    // console.log(listHumanQueries);
+
+    listOfBotResponses.push(botResponses);
+    botResponses = null;
+    console.log("Bot responses: " + listOfBotResponses);
+
 
     //Todo creating a mongoDB update function.
 
-    res.render('chatBot.ejs', { pageType: 'chatBot', humanQueries: listHumanQueries });
+    res.render('chatBot.ejs', { pageType: 'chatBot', humanQueries: listHumanQueries, botResponses: listOfBotResponses });
 });
 
 app.post("/", (req, res) => {
@@ -76,12 +81,10 @@ app.post("/", (req, res) => {
     // item = req.body.newItem;
     humansQuery = req.body.humansQuery;
 
-    console.log("Human typed: " + humansQuery);
+    // console.log("Human typed: " + humansQuery);
 
     // Todo query api using humansQuery and return output.
     apiRequestFunction(key, humansQuery);
-
-
 
     // Todo: Change statement below, to items array should be changed to
     // adding data to the humanQuery collection.
@@ -122,16 +125,12 @@ function apiRequestFunction(key, query) {
 
         endPointRequest.then((data) => {
             intentType = data.body.topScoringIntent.intent;
-            console.log("New intent is: " + intentType);
+            // console.log("New intent is: " + intentType);
             console.log(data.body.topScoringIntent);
-            console.log(data.body);
+            // console.log(data.body);
 
             // querying database using intent types
-            let correspondingDocs = returnAnswersCorrespondingTo(intentType, mongoose.model('Answer', answerSchema));
-
-            // passing retrieved documents to the cross-referencing function.
-            // todo
-            entityCrossReferenceWith(correspondingDocs);
+            returnAnswersCorrespondingTo(intentType, mongoose.model('Answer', answerSchema));
 
         }).catch((err) => {
             console.log("Connection to api timed out.");
@@ -139,7 +138,6 @@ function apiRequestFunction(key, query) {
 
     } else {
         console.log("Null request can't be processed.");
-
     }
 }
 
@@ -147,35 +145,38 @@ function apiRequestFunction(key, query) {
 // Else do nothing.
 function checkIfDataBaseExists(Model) {
     if (Model.exists({})) {
-        console.log("db exists");
+        // console.log("db exists");
     } else {
-        console.log("db doesn't exists");
-        console.log("creating db");
+        // console.log("db doesn't exists");
+        // console.log("creating db");
+
         // compiling schema into models
         // creating database if not already existing.
         createNewLuisDBInstance(Model);
     }
 }
 
-
 // returning answers corresponding to the intentTypes.
 function returnAnswersCorrespondingTo(intentTypes, Answer) {
     Answer.find({ intentType: intentTypes }, function(err, docs) {
-        console.log(docs);
-        return docs;
+        // console.log("In returnFunc: " + docs);
+        entityCrossReferenceWith(docs);
     });
 }
 
-// this functions returns the best answer, to any given question,
-// by cross-referencing answerLists with the returned entities.
-// Function should return a single question or a combination of questions
+// // this functions returns the best answer, to any given question,
+// // by cross-referencing answerLists with the returned entities.
+// // Function should return a single question or a combination of questions
 function entityCrossReferenceWith(docs) {
-    console.log("Starting cross-referencing.");
+    // console.log("Starting cross-referencing");
     // Todo, use entity list to check best possible answer for a given query.
-
     // warning: function returning arbitrary choice at this point.
-    // return ;
+    botResponses = docs[0].possibleAnswers[0];
+    // listOfBotResponses.push(docs[0].possibleAnswers[0]);
+    // console.log(botResponses);
+
 }
+
 
 // creating a bunch of objects to insert into the documents.
 function createNewLuisDBInstance(Answer) {
@@ -361,6 +362,6 @@ function createNewLuisDBInstance(Answer) {
     ];
 
     Answer.insertMany(arrConvoLines, function(err) {
-        console.log("inserting into db");
+        // console.log("inserting into db");
     });
 }
