@@ -17,7 +17,6 @@ const key = '205455bb2302469c9e4ee8194534b487';
 // connecting the mongo database.
 mongoose.connect("mongodb://localhost/luisDB", { useUnifiedTopology: true, useNewUrlParser: true });
 
-let answerSchema = null;
 
 let humansQuery = "";
 let listHumanQueries = [];
@@ -33,7 +32,7 @@ db.once('open', function() {
     console.log('app db connected');
 
     // creating database schema
-    answerSchema = new mongoose.Schema({
+    let answerSchema = new mongoose.Schema({
         intentType: {
             type: String
         },
@@ -43,8 +42,10 @@ db.once('open', function() {
     });
 
     // Todo replace deleted commands, with
-    // function for making apiRequests.
-    apiRequestFunction(key, query);
+    if (!(query == '' || query == null)) {
+        // function for making apiRequests.
+        apiRequestFunction(key, query);
+    }
 
     checkIfDataBaseExists(mongoose.model('Answer', answerSchema));
 });
@@ -145,11 +146,10 @@ function apiRequestFunction(key, query) {
 // Else do nothing.
 function checkIfDataBaseExists(Model) {
     if (Model.exists({})) {
-        // console.log("db exists");
+        console.log("db exists");
     } else {
-        // console.log("db doesn't exists");
-        // console.log("creating db");
-
+        console.log("db doesn't exists");
+        console.log("creating db");
         // compiling schema into models
         // creating database if not already existing.
         createNewLuisDBInstance(Model);
@@ -159,8 +159,9 @@ function checkIfDataBaseExists(Model) {
 // returning answers corresponding to the intentTypes.
 function returnAnswersCorrespondingTo(intentTypes, Answer) {
     Answer.find({ intentType: intentTypes }, function(err, docs) {
-        // console.log("In returnFunc: " + docs);
-        entityCrossReferenceWith(docs);
+        // entityCrossReferenceWith(docs);
+        console.log(docs);
+
     });
 }
 
@@ -172,9 +173,6 @@ function entityCrossReferenceWith(docs) {
     // Todo, use entity list to check best possible answer for a given query.
     // warning: function returning arbitrary choice at this point.
     botResponses = docs[0].possibleAnswers[0];
-    // listOfBotResponses.push(docs[0].possibleAnswers[0]);
-    // console.log(botResponses);
-
 }
 
 
@@ -361,7 +359,9 @@ function createNewLuisDBInstance(Answer) {
         convoLine6, convoLine7, convoLine8, convoLine9, convoLine10
     ];
 
-    Answer.insertMany(arrConvoLines, function(err) {
-        // console.log("inserting into db");
+    // Answer.insertMany(arrConvoLines, function(err) {});
+    Answer.create(arrConvoLines, function(err, small) {
+        if (err) return handleError(err);
+        // saved!
     });
 }

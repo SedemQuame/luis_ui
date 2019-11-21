@@ -28,13 +28,17 @@
     <div class="bot offset-md-3 col-md-6 offset-lg-4 col-lg-4">
         <div class="messageContainer">
             <div class="messages">
-                <% for(let i = 0; i < humanQueries.length; i++){ %>
+                <% for(let i = 1, j = 0; i < humanQueries.length && j < botResponses.length; i++, j++){ %>
                     <p class="msg humanQuery">
                         <%= humanQueries[i] %>
                     </p>
                     <% if(i > 1) { %>
                         <p class="msg botResponse">
-                            <%= botResponses[i] %>
+                            <% if(botResponses[j] == null) { %>
+                                Connection timed, out can't reach server at the moment 😢🤦.<br> Please try later.
+                                <% }else{%>
+                                    <%= botResponses[j] %>
+                                        <% } %>
                         </p>
                         <% } %>
                             <%}%>
